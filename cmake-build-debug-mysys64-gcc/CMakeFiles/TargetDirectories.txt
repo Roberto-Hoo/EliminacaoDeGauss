@@ -1,0 +1,3 @@
+S:/Programacao/CParalelaUfrgs2020_2/EliminacaoDeGauss/cmake-build-debug-mysys64-gcc/CMakeFiles/EliminacaoDeGauss.dir
+S:/Programacao/CParalelaUfrgs2020_2/EliminacaoDeGauss/cmake-build-debug-mysys64-gcc/CMakeFiles/edit_cache.dir
+S:/Programacao/CParalelaUfrgs2020_2/EliminacaoDeGauss/cmake-build-debug-mysys64-gcc/CMakeFiles/rebuild_cache.dir
