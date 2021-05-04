@@ -1,45 +1,39 @@
 #include <iostream>
 
 using namespace std;
-
+bool imprime1 = false;
 bool imprime = true;
 double a = 1.0, s = 1.0;
-int N = 5;
+int N = 4;
 double maior;
 int *ptrlin = nullptr;
 int *ptrcol = nullptr;
 int lin = 0;
 int col = 0;
 double **A = nullptr;
-double **A1 = nullptr;
 double *b = nullptr;
 double *b1 = nullptr;//
 double *x = nullptr; //
 int *ind = nullptr;
-int indice ;
+int indice;
+
 /*
  * Retorna um número aleatorio inteiro entre minimo e o maximo(inclusive os extremos)
  */
 int numeroAleatorio(int minimo, int maximo);
-
 void Gauss(double **&A, double *&b, double *&x);
-
 double CalculaMaior(int indice, int N, double **&A);
-
-void imprimeMatriz(int N, char *nome, double **&A);
-
+void imprimeMatriz(char *nome, double A[][N]);
 void trocaLinha(int N, int ColInicial, int lin, int linDest, double **&A, double *&b);
-
-void imprimeMatriz_Ab(int N, char *nome, double **&A, double *&b);
-
-void imprimeMatriz_Ax_b(int N, char *nome, double **&A, double *&x, double *&b);
-
+void imprimeMatriz_Ab(char *nome, double **&A, double *&b);
+void imprimeMatriz_Ax_b(char *nome, double **&A, double *&x, double *&b);
 void trocaColuna(int N, int LinInicial, int col, int colDest, double **&A, int *&ind);
-
 void eliminacaoGauss(int N, int lin, int col, double **&A, double *&b);
+void imprimeMatriz_Ax_b2(int N, char *nome, double **&A, double *&x, double *&b);
+void multiplica(double A[][N],double x[N],double *&b1);
 
 int main() {
-    if (imprime) {
+    if (imprime1) {
         cout << "\nHello, World!";
         printf("\nSize of a = %d e de s = %d,  a = %f,  s = %f", sizeof(a), sizeof(s), a, s);
         for (int i = 1; i <= 5; i++) {
@@ -55,18 +49,53 @@ int main() {
     b = new double[N];
     x = new double[N];
     ind = new int[N];
-
+    double bb[N];
+    double AA[N][N];
     for (int i = 0; i < N; i++) {
         A[i] = new double[N];
-        b[i] = (double) numeroAleatorio(1, 100);
+        b[i] = (double) numeroAleatorio(1, 10);
+        bb[i] = b[i];
         for (int j = 0; j < N; j++) {
-            A[i][j] = (double) numeroAleatorio(1, 100);
+            A[i][j] = (double) numeroAleatorio(1, 10);
+            AA[i][j] = A[i][j];
         }
-
     }
 
+    imprimeMatriz_Ab("Matriz A b",A, b);
+
     Gauss(A, b, x);
+
+    double soma ;
+    printf("\n");
+    for (int i = 0; i < N; i++) {
+        soma = 0.0;
+        for (int j = 0; j < N; j++) {
+            printf(" %8.2f ", AA[i][j]);
+            soma += AA[i][j]*x[j];
+        }
+        printf("     %8.5f    %8.2f  AproxAx = %8.5f\n", x[i], bb[i] , soma);
+    }
+
+
+    b1 = new double[N];
+    multiplica(AA,x,b1);
+
+    for(int i=0;i<N;i++)
+        printf(" %5.2f  ",b1[i]);
     return 0;
+}
+
+void multiplica(double A[][N],double x[N],double *&b1){
+    double soma;
+    for (int i=0;i<N;i++){
+        soma = 0.0;
+        for(int j=0;j<N;j++){
+            soma += A[i][j]*x[j];
+        }
+        b1[i]=soma;
+    }
+
+
 }
 
 /*
@@ -77,38 +106,22 @@ int numeroAleatorio(int minimo, int maximo) {
 }
 
 void Gauss(double **&A, double *&b, double *&x) {
-    if (imprime) {
+    if (imprime1) {
         printf("\n Vetor b = ");
         for (int i = 0; i < N; i++) {
             printf(" %6.2f ", b[i]);
         }
-        /*
-        printf("\n Matriz A = \n");
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                printf(" %6.2f ", A[i][j]);
-            }
-            printf("\n");
-        }
-        */
-        //imprimeMatriz(N, "Matriz A =",A);
-        imprimeMatriz_Ax_b(N, "Ax = b", A, x, b);
+
+        imprimeMatriz_Ax_b("Ax = b", A, x, b);
     }
 
 
     for (int i = 0; i < N; i++) {
         ind[i] = i;
-        if (imprime)
+        if (imprime1)
             printf(" ind[%d] = %d ", i, ind[i]);
     }
-    double AA[N][N];
-    double bb[N];
 
-    for(int i =0;i<N;i++){
-        bb[i]=b[i];
-        for(int j=0;j<N;j++)
-            AA[i][j]=A[i][j];
-    }
     ptrcol = &col;
     ptrlin = &lin;
     //maior =
@@ -117,35 +130,35 @@ void Gauss(double **&A, double *&b, double *&x) {
     int jcol = 0;
     indice = 0;
 
-    while (indice<N-1) {
-        N=5;
-        if (imprime) {
-            imprimeMatriz_Ax_b(N, "Ax = b", A, x, b);
+    while (indice < N - 1) {
+
+        if (imprime1) {
+            imprimeMatriz_Ax_b("Ax = b", A, x, b);
         }
-        maior = CalculaMaior(indice,N, A);
-        if (imprime) {
+        maior = CalculaMaior(indice, N, A);
+        if (imprime1) {
             printf("\n lin = %d col = %d  maior = %6.2f", lin, col, A[lin][col]);
         }
 
         if (lin != ilin)
             trocaLinha(N, 0, lin, ilin, A, b);
 
-        if (imprime) {
-            imprimeMatriz_Ax_b(N, "Ax = b", A, x, b);
+        if (imprime1) {
+            imprimeMatriz_Ax_b("Ax = b", A, x, b);
         }
 
         if (col != jcol) {
             trocaColuna(N, 0, col, jcol, A, ind);
         }
 
-        if (imprime) {
-            imprimeMatriz_Ax_b(N, "Ax = b", A, x, b);
+        if (imprime1) {
+            imprimeMatriz_Ax_b("Ax = b", A, x, b);
         }
 
         eliminacaoGauss(N, ilin, jcol, A, b);
 
-        if (imprime) {
-            imprimeMatriz_Ax_b(N, "Ax = b", A, x, b);
+        if (imprime1) {
+            imprimeMatriz_Ax_b("Ax = b", A, x, b);
         }
 
         indice++;
@@ -153,31 +166,35 @@ void Gauss(double **&A, double *&b, double *&x) {
         jcol = indice;
     }
 
-    for (int i = N-1;i>-1;i--){
+    for (int i = N - 1; i > -1; i--) {
         double soma = 0.0;
-        for (int j = i;j<N-1;j++)
-            soma +=  x[ind[i]]*A[i][j];
-        x[ind[i]] = (b[i]-soma)/A[i][i];
+        for (int j = i; j < N-1 ; j++)
+            soma += x[ind[j+1]] * A[i][j+1];
+        x[ind[i]] = (b[i] - soma) / A[i][i];
+        if (imprime1) {
+            printf("x[%d] = %12.10f ", i, x[ind[i]]);
+        }
     }
 
-    if (imprime) {
-        imprimeMatriz_Ax_b(N, "Ax = b", A, x, b);
+
+    if (imprime1) {
+        imprimeMatriz_Ax_b2(N, " Final Ax = b", A, x, b);
     }
 
 
 }
 
-double CalculaMaior(int indice,int N, double **&A) {
+double CalculaMaior(int indice, int N, double **&A) {
     double maior = abs(A[indice][indice]);
-    if (imprime) {
-        printf("\nA[0][0] = %6.2f  N = %d", A[indice][indice], N);
+    if (imprime1) {
+        printf("\nA[0][0] = %10.5f  N = %d", A[indice][indice], N);
     }
     for (int i = indice; i < N; i++)
         for (int j = indice; j < N; j++)
             if (abs(A[i][j]) > maior) {
                 maior = A[i][j];
-                if (imprime) {
-                    printf("\nA[%d][%d] = %6.2f", i, j, A[i][j]);
+                if (imprime1) {
+                    printf("\nA[%d][%d] = %10.5f", i, j, A[i][j]);
                 }
                 *ptrlin = i;
                 *ptrcol = j;
@@ -185,38 +202,48 @@ double CalculaMaior(int indice,int N, double **&A) {
     return maior;
 }
 
-void imprimeMatriz(int N, char *nome, double **&A) {
+void imprimeMatriz(char *nome, double A[][N]) {
     printf("\n  %s \n", nome);
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
-            printf(" %6.2f ", A[i][j]);
+            printf(" %10.5f ", A[i][j]);
         }
         printf("\n");
     }
 }
 
-void imprimeMatriz_Ab(int N, char *nome, double **&A, double *&b) {
+void imprimeMatriz_Ab(char *nome, double **&A, double *&b) {
     printf("\n  %s \n", nome);
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
-            printf(" %6.2f ", A[i][j]);
+            printf(" %10.5f ", A[i][j]);
         }
-        printf("    %6.2f\n", b[i]);
+        printf("    %10.5f\n", b[i]);
     }
 }
 
-void imprimeMatriz_Ax_b(int N, char *nome, double **&A, double *&x, double *&b) {
+void imprimeMatriz_Ax_b(char *nome, double **&A, double *&x, double *&b) {
     printf("\n  %s \n", nome);
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
-            printf(" %8.1f ", A[i][j]);
+            printf(" %10.5f ", A[i][j]);
         }
-        printf("    x[%d]   %8.1f\n", ind[i], b[i]);
+        printf("    x[%d]   %10.5f\n", ind[i], b[i]);
+    }
+}
+
+void imprimeMatriz_Ax_b2(int N, char *nome, double **&A, double *&x, double *&b) {
+    printf("\n  %s \n", nome);
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            printf(" %10.2f ", A[i][j]);
+        }
+        printf("    x[%d] = %10.5f     %10.2f\n", ind[i], x[ind[i]], b[i]);
     }
 }
 
 
-void trocaLinha(int N, int ColInicial, int lin, int linDest, double **&A, double *&indX) {
+void trocaLinha(int N, int ColInicial, int lin, int linDest, double **&A, double *&b) {
     if (lin != linDest) {
         double aux = b[lin];
         b[lin] = b[linDest];
@@ -252,15 +279,16 @@ void trocaColuna(int N, int LinInicial, int col, int colDest, double **&A, int *
 
 void eliminacaoGauss(int N, int lin, int col, double **&A, double *&b) {
     double aux1 = A[lin][col];
-    if (imprime)
-        printf("A[%d][%d] = %6.2f",lin,col,A[lin][col]);
+    if (imprime1)
+        printf("A[%d][%d] = %6.2f", lin, col, A[lin][col]);
     for (int i = lin + 1; i < N; i++) {
         if (abs(A[i][col]) > 1e-14) {
             double aux2 = A[i][col];
             for (int j = 0; j < N; j++) {
-                A[i][j] = A[i][j]  - A[lin][j]*aux2/aux1;
+                A[i][j] = A[i][j] - A[lin][j] * aux2 / aux1;
             }
-            b[i] = b[i] - b[lin]*aux2/aux1;
+            b[i] = b[i] - b[lin] * aux2 / aux1;
         }
     }
 }
+
